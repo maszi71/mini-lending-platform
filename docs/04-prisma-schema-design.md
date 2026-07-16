@@ -14,9 +14,13 @@ backend/prisma/schema.prisma
 - Use Prisma Client as the backend database access layer.
 - Use `String` IDs with `uuid()` defaults.
 - Use `Decimal` for money and rate fields.
+- Use `Decimal(18,2)` for money fields.
+- Use `Decimal(5,2)` for `annualInterestRate`.
 - Use `Json` for flexible audit metadata.
 - Use explicit relation names where one model relates to another model in more than one way.
 - Use indexes on common filter and lookup fields.
+- Generate Prisma Client into `backend/src/generated/prisma`.
+- Do not commit generated client files; regenerate them with npm scripts.
 
 ## Enums
 

@@ -560,3 +560,33 @@ Reason:
 - It lets us review models, fields, relations, indexes, and constraints before coding.
 - It keeps the actual implementation grounded in the domain model and business rules.
 - It gives the user a clear explanation of how domain concepts become database models.
+
+## 2026-07-16 - Prisma Generated Client Handling
+
+Decision:
+
+Do not commit the generated Prisma Client output at `backend/src/generated/prisma/`.
+
+Instead, regenerate it with npm scripts:
+
+- `postinstall`
+- `prebuild`
+- `npm run prisma:generate`
+
+Reason:
+
+- Generated code should not clutter project commits.
+- A fresh clone can recreate the client from `backend/prisma/schema.prisma`.
+- Running generation before build prevents missing generated client issues.
+
+## 2026-07-16 - Local PostgreSQL Port
+
+Decision:
+
+Expose the project PostgreSQL container on local port `5433` instead of `5432`.
+
+Reason:
+
+- Port `5432` was already allocated on the user's machine.
+- Using `5433` avoids conflict with an existing local PostgreSQL instance.
+- The container still uses PostgreSQL's internal port `5432`.

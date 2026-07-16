@@ -26,6 +26,7 @@ pnpm-debug.log*
 # Prisma/local database artifacts
 *.db
 *.db-journal
+backend/src/generated/prisma/
 
 # Docker
 docker-data/

@@ -106,6 +106,34 @@ mini-lending-platform/
 - [Project flow](./docs/03-project-flow.md)
 - [Prisma schema design](./docs/04-prisma-schema-design.md)
 
+## Local Development
+
+Start PostgreSQL:
+
+```bash
+docker compose up -d postgres
+```
+
+PostgreSQL is exposed locally on port `5433` to avoid conflicts with any existing local PostgreSQL server on `5432`.
+
+Backend setup:
+
+```bash
+cd backend
+npm install
+npm run prisma:migrate -- --name init
+npm run start:dev
+```
+
+Useful backend commands:
+
+```bash
+npm run prisma:validate
+npm run prisma:generate
+npm run build
+npm test -- --runInBand
+```
+
 ## Current Product Decisions
 
 - Phase 1 has two roles: `CUSTOMER` and `ADMIN`.
@@ -117,4 +145,4 @@ mini-lending-platform/
 
 ## Status
 
-Project planning and documentation are in progress.
+Backend scaffold, Docker PostgreSQL setup, and initial Prisma schema are in progress.

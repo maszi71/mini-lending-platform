@@ -1,0 +1,215 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum LoanStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum LoanApplicationStep {
+  LOAN_DETAILS
+  FINANCIAL_PROFILE
+  COLLATERAL
+  REVIEW
+}
+
+enum LoanPurpose {
+  BUSINESS
+  HOME_RENOVATION
+  EDUCATION
+  MEDICAL
+  DEBT_CONSOLIDATION
+  PERSONAL
+  OTHER
+}
+
+enum EmploymentType {
+  SALARIED
+  SELF_EMPLOYED
+  BUSINESS_OWNER
+  FREELANCER
+  UNEMPLOYED
+  RETIRED
+  OTHER
+}
+
+enum CollateralType {
+  CHEQUE
+  SALARY_CERTIFICATE
+  GOLD
+  STOCK
+  CRYPTO
+  PROPERTY_DOCUMENT
+  VEHICLE_DOCUMENT
+  OTHER
+}
+
+enum CollateralStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum InstallmentStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+enum PaymentMethod {
+  MOCK
+}
+
+enum AuditAction {
+  APPLICATION_CREATED
+  APPLICATION_UPDATED
+  APPLICATION_SUBMITTED
+  REVIEW_STARTED
+  APPLICATION_APPROVED
+  APPLICATION_REJECTED
+  INSTALLMENTS_CREATED
+  INSTALLMENT_PAID
+}
+
+model User {
+  id           String   @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String   @unique
+  phoneNumber  String   @unique
+  birthDate    DateTime
+  passwordHash String
+  role         UserRole @default(CUSTOMER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  loanApplications     LoanApplication[] @relation("CustomerLoanApplications")
+  reviewedApplications LoanApplication[] @relation("ReviewedLoanApplications")
+  auditLogs            AuditLog[]        @relation("ActorAuditLogs")
+
+  @@index([role])
+  @@index([createdAt])
+}
+
+model LoanApplication {
+  id                      String              @id @default(uuid())
+  customerId              String
+  requestedAmount         Decimal?            @db.Decimal(18, 2)
+  requestedDurationMonths Int?
+  purpose                 LoanPurpose?
+  description             String?
+  monthlyIncome           Decimal?            @db.Decimal(18, 2)
+  employmentType          EmploymentType?
+  existingMonthlyDebt     Decimal?            @db.Decimal(18, 2)
+  status                  LoanStatus          @default(DRAFT)
+  currentStep             LoanApplicationStep @default(LOAN_DETAILS)
+  approvedAmount          Decimal?            @db.Decimal(18, 2)
+  approvedDurationMonths  Int?
+  annualInterestRate      Decimal?            @db.Decimal(5, 2)
+  decisionReason          String?
+  reviewedById            String?
+  submittedAt             DateTime?
+  reviewedAt              DateTime?
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+
+  customer     User          @relation("CustomerLoanApplications", fields: [customerId], references: [id])
+  reviewedBy   User?         @relation("ReviewedLoanApplications", fields: [reviewedById], references: [id])
+  collaterals  Collateral[]
+  installments Installment[]
+  auditLogs    AuditLog[]
+
+  @@index([customerId])
+  @@index([status])
+  @@index([currentStep])
+  @@index([createdAt])
+  @@index([submittedAt])
+  @@index([reviewedById])
+}
+
+model Collateral {
+  id                String           @id @default(uuid())
+  loanApplicationId String
+  type              CollateralType
+  estimatedValue    Decimal          @db.Decimal(18, 2)
+  description       String?
+  status            CollateralStatus @default(PENDING)
+  reviewerNote      String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  loanApplication LoanApplication @relation(fields: [loanApplicationId], references: [id])
+
+  @@index([loanApplicationId])
+  @@index([status])
+}
+
+model Installment {
+  id                String            @id @default(uuid())
+  loanApplicationId String
+  installmentNumber Int
+  dueDate           DateTime
+  principalAmount   Decimal           @db.Decimal(18, 2)
+  interestAmount    Decimal           @db.Decimal(18, 2)
+  totalAmount       Decimal           @db.Decimal(18, 2)
+  paidAmount        Decimal           @default(0) @db.Decimal(18, 2)
+  status            InstallmentStatus @default(PENDING)
+  paidAt            DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  loanApplication LoanApplication @relation(fields: [loanApplicationId], references: [id])
+  payments        Payment[]
+
+  @@unique([loanApplicationId, installmentNumber])
+  @@index([loanApplicationId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  installmentId   String
+  amount          Decimal       @db.Decimal(18, 2)
+  method          PaymentMethod @default(MOCK)
+  referenceNumber String        @unique
+  paidAt          DateTime      @default(now())
+  createdAt       DateTime      @default(now())
+
+  installment Installment @relation(fields: [installmentId], references: [id])
+
+  @@index([installmentId])
+  @@index([paidAt])
+}
+
+model AuditLog {
+  id                String      @id @default(uuid())
+  actorId           String
+  loanApplicationId String?
+  action            AuditAction
+  metadata          Json?
+  createdAt         DateTime    @default(now())
+
+  actor           User             @relation("ActorAuditLogs", fields: [actorId], references: [id])
+  loanApplication LoanApplication? @relation(fields: [loanApplicationId], references: [id])
+
+  @@index([actorId])
+  @@index([loanApplicationId])
+  @@index([action])
+  @@index([createdAt])
+}
