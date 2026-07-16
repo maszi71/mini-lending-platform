@@ -135,6 +135,78 @@ Examples in this project:
 
 Entities usually become database tables, Prisma models, and backend concepts.
 
+## Domain Model
+
+A domain model describes the important business objects in the system and how they relate to each other.
+
+In this project, the domain model includes:
+
+- `User`
+- `LoanApplication`
+- `Collateral`
+- `Installment`
+- `Payment`
+- `AuditLog`
+
+Domain modeling comes before database implementation because we first need to understand the business concepts before turning them into tables.
+
+## Relationship
+
+A relationship describes how entities connect to each other.
+
+Examples in this project:
+
+- A `User` has many `LoanApplication` records.
+- A `LoanApplication` belongs to one `User`.
+- A `LoanApplication` has many `Collateral` records.
+- An `Installment` has many `Payment` records.
+
+Relationships become Prisma relations and database foreign keys.
+
+## Decimal
+
+`Decimal` is a precise numeric type used for money and rates.
+
+Money should not be stored with floating-point types because floats can produce rounding errors.
+
+Example:
+
+```txt
+0.1 + 0.2
+```
+
+In many programming environments, this does not produce exactly `0.3` with floating-point math.
+
+For this project, fields like `requestedAmount`, `approvedAmount`, `annualInterestRate`, and `totalAmount` should use `Decimal`.
+
+## JSON Metadata
+
+JSON metadata is flexible structured data stored with a record.
+
+In this project, `AuditLog.metadata` can store different details for different actions.
+
+Examples:
+
+```json
+{
+  "oldStatus": "UNDER_REVIEW",
+  "newStatus": "APPROVED",
+  "approvedAmount": "100000000"
+}
+```
+
+or:
+
+```json
+{
+  "installmentId": "abc123",
+  "amount": "10333333",
+  "referenceNumber": "MOCK-123"
+}
+```
+
+This avoids creating many optional columns for action-specific audit details.
+
 ## Business Rule
 
 A business rule is a condition that controls what the system allows, blocks, or automatically performs.
@@ -305,6 +377,79 @@ POST /loans/:id/submit
 ```
 
 This endpoint may mean: submit a draft loan application for admin review.
+
+## Pagination
+
+Pagination means returning a list in smaller chunks instead of returning all records at once.
+
+Example:
+
+```txt
+GET /admin/loans?page=1&limit=10
+```
+
+Example response shape:
+
+```json
+{
+  "data": [],
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "total": 57,
+    "totalPages": 6
+  }
+}
+```
+
+Pagination is important because large result sets can slow down the database, backend, network, and frontend.
+
+## Filtering
+
+Filtering means asking the backend to return only records that match certain conditions.
+
+Example:
+
+```txt
+GET /admin/loans?status=SUBMITTED
+```
+
+This returns only submitted loan applications.
+
+## Sorting
+
+Sorting means asking the backend to order records by a specific field and direction.
+
+Example:
+
+```txt
+GET /admin/loans?sortBy=createdAt&sortOrder=desc
+```
+
+This returns the newest records first.
+
+## Swagger / OpenAPI
+
+Swagger is a tool for documenting and testing APIs.
+
+OpenAPI is the specification format behind Swagger.
+
+In this project, Swagger will show:
+
+- Endpoints
+- Request bodies
+- Response shapes
+- Query params
+- Path params
+- Bearer auth requirements
+
+Planned backend docs URL:
+
+```txt
+/api/docs
+```
+
+Swagger is useful because it makes the backend contract visible while we build and test the app.
 
 ## Database Schema
 

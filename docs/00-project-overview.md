@@ -212,3 +212,355 @@ monthlyInstallment = 10,333,333
 ```
 
 This is intentionally simple for the MVP. More realistic amortized loan calculations can be added later.
+
+## Domain Model
+
+### Relationships
+
+```txt
+User
+ ├── LoanApplication[]
+ │    ├── Collateral[]
+ │    └── Installment[]
+ │         └── Payment[]
+ └── AuditLog[]
+```
+
+### User
+
+Fields:
+
+- `id`
+- `firstName`
+- `lastName`
+- `email`
+- `phoneNumber`
+- `birthDate`
+- `passwordHash`
+- `role`
+- `createdAt`
+- `updatedAt`
+
+Relations:
+
+- `loanApplications`
+- `auditLogs`
+- `reviewedApplications`
+
+### LoanApplication
+
+Fields:
+
+- `id`
+- `customerId`
+- `requestedAmount`
+- `requestedDurationMonths`
+- `purpose`
+- `description`
+- `monthlyIncome`
+- `employmentType`
+- `existingMonthlyDebt`
+- `status`
+- `currentStep`
+- `approvedAmount`
+- `approvedDurationMonths`
+- `annualInterestRate`
+- `decisionReason`
+- `reviewedById`
+- `submittedAt`
+- `reviewedAt`
+- `createdAt`
+- `updatedAt`
+
+Relations:
+
+- `customer`
+- `reviewedBy`
+- `collaterals`
+- `installments`
+- `auditLogs`
+
+### Collateral
+
+Fields:
+
+- `id`
+- `loanApplicationId`
+- `type`
+- `estimatedValue`
+- `description`
+- `status`
+- `reviewerNote`
+- `createdAt`
+- `updatedAt`
+
+Relations:
+
+- `loanApplication`
+
+### Installment
+
+Fields:
+
+- `id`
+- `loanApplicationId`
+- `installmentNumber`
+- `dueDate`
+- `principalAmount`
+- `interestAmount`
+- `totalAmount`
+- `paidAmount`
+- `status`
+- `paidAt`
+- `createdAt`
+- `updatedAt`
+
+Relations:
+
+- `loanApplication`
+- `payments`
+
+### Payment
+
+Fields:
+
+- `id`
+- `installmentId`
+- `amount`
+- `method`
+- `referenceNumber`
+- `paidAt`
+- `createdAt`
+
+Relations:
+
+- `installment`
+
+### AuditLog
+
+Fields:
+
+- `id`
+- `actorId`
+- `loanApplicationId`
+- `action`
+- `metadata`
+- `createdAt`
+
+Relations:
+
+- `actor`
+- `loanApplication`
+
+### Enums
+
+```txt
+UserRole:
+- CUSTOMER
+- ADMIN
+
+LoanStatus:
+- DRAFT
+- SUBMITTED
+- UNDER_REVIEW
+- APPROVED
+- REJECTED
+- CANCELLED
+
+LoanApplicationStep:
+- LOAN_DETAILS
+- FINANCIAL_PROFILE
+- COLLATERAL
+- REVIEW
+
+LoanPurpose:
+- BUSINESS
+- HOME_RENOVATION
+- EDUCATION
+- MEDICAL
+- DEBT_CONSOLIDATION
+- PERSONAL
+- OTHER
+
+EmploymentType:
+- SALARIED
+- SELF_EMPLOYED
+- BUSINESS_OWNER
+- FREELANCER
+- UNEMPLOYED
+- RETIRED
+- OTHER
+
+CollateralType:
+- CHEQUE
+- SALARY_CERTIFICATE
+- GOLD
+- STOCK
+- CRYPTO
+- PROPERTY_DOCUMENT
+- VEHICLE_DOCUMENT
+- OTHER
+
+CollateralStatus:
+- PENDING
+- ACCEPTED
+- REJECTED
+
+InstallmentStatus:
+- PENDING
+- PAID
+- OVERDUE
+
+PaymentMethod:
+- MOCK
+
+AuditAction:
+- APPLICATION_CREATED
+- APPLICATION_UPDATED
+- APPLICATION_SUBMITTED
+- REVIEW_STARTED
+- APPLICATION_APPROVED
+- APPLICATION_REJECTED
+- INSTALLMENTS_CREATED
+- INSTALLMENT_PAID
+```
+
+## API Contract Draft
+
+### Auth APIs
+
+- `POST /auth/register`
+- `POST /auth/login`
+- `GET /auth/me`
+
+Rules:
+
+- Public registration creates `CUSTOMER` users only.
+- Login uses `identifier` and `password`.
+- `identifier` can be email or phone number.
+
+### Customer Loan APIs
+
+- `POST /loans`
+- `GET /loans/my`
+- `GET /loans/:id`
+- `PATCH /loans/:id/loan-details`
+- `PATCH /loans/:id/financial-profile`
+- `PATCH /loans/:id/current-step`
+- `POST /loans/:id/submit`
+- `POST /loans/:id/cancel`
+
+Rules:
+
+- Customer loan list is paginated.
+- Stepper data is saved through separate endpoints.
+- Customers can submit only valid draft applications.
+
+### Collateral APIs
+
+- `POST /loans/:loanId/collaterals`
+- `GET /loans/:loanId/collaterals`
+- `PATCH /collaterals/:id`
+- `DELETE /collaterals/:id`
+
+Rules:
+
+- Customers can modify collateral only while the loan application is `DRAFT`.
+
+### Admin Review APIs
+
+- `GET /admin/loans`
+- `GET /admin/loans/:id`
+- `POST /admin/loans/:id/start-review`
+- `POST /admin/loans/:id/approve`
+- `POST /admin/loans/:id/reject`
+- `POST /admin/collaterals/:id/review`
+
+Rules:
+
+- Admin loan list is paginated.
+- Admin loan list supports filtering and sorting.
+- Admin must start review before approving or rejecting.
+- Approval creates installments.
+
+### Installment And Payment APIs
+
+- `GET /loans/:loanId/installments`
+- `POST /installments/:id/pay`
+
+Rules:
+
+- Phase 1 supports full installment payment only.
+- Paid installments cannot be paid again.
+
+### Dashboard APIs
+
+- `GET /customer/dashboard`
+- `GET /admin/dashboard`
+
+### Admin Audit Log APIs
+
+- `GET /admin/audit-logs`
+
+Rules:
+
+- Audit logs are admin-only in Phase 1.
+- Audit logs are paginated.
+- Audit logs can be filtered by `loanApplicationId`, `actorId`, and `action`.
+
+## Pagination Standard
+
+Use page-based pagination.
+
+Query params:
+
+- `page`
+- `limit`
+
+Defaults:
+
+- `page = 1`
+- `limit = 10`
+
+Maximum:
+
+- `limit = 50`
+
+Response shape:
+
+```json
+{
+  "data": [],
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "total": 57,
+    "totalPages": 6
+  }
+}
+```
+
+Paginated endpoints:
+
+- `GET /loans/my`
+- `GET /admin/loans`
+- `GET /admin/audit-logs`
+
+## API Documentation
+
+Use Swagger/OpenAPI for backend API documentation.
+
+Planned docs URL:
+
+```txt
+/api/docs
+```
+
+The backend should use NestJS Swagger decorators to document:
+
+- Endpoint groups
+- Request bodies
+- Query params
+- Path params
+- Response shapes
+- Bearer auth requirements

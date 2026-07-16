@@ -344,3 +344,194 @@ Reason:
 - It is enough for practicing installment generation.
 - It avoids overcomplicating the MVP with amortization formulas.
 - More realistic interest calculations can be added later.
+
+## 2026-07-16 - Domain Model Entities
+
+Decision:
+
+Use these main entities for the MVP:
+
+- `User`
+- `LoanApplication`
+- `Collateral`
+- `Installment`
+- `Payment`
+- `AuditLog`
+
+Reason:
+
+- They represent the core lending workflow without adding unnecessary complexity.
+- They map cleanly to the customer/admin flows.
+- They are enough to support application review, collateral, installments, mock payments, and audit history.
+
+## 2026-07-16 - No Separate Loan Entity For MVP
+
+Decision:
+
+Do not create a separate `Loan` entity in Phase 1. Use `LoanApplication` as the main record before and after approval.
+
+Reason:
+
+- Before approval, the record is a request.
+- After approval, the same record stores approved terms and has installments.
+- A separate `Loan` table can be added later if the system becomes more complex.
+- Keeping one main record makes the MVP easier to understand and implement.
+
+## 2026-07-16 - Money And Rate Fields Use Decimal
+
+Decision:
+
+Use `Decimal` for money and rate fields.
+
+Examples:
+
+- `requestedAmount`
+- `monthlyIncome`
+- `existingMonthlyDebt`
+- `approvedAmount`
+- `annualInterestRate`
+- `estimatedValue`
+- `principalAmount`
+- `interestAmount`
+- `totalAmount`
+- `paidAmount`
+- `Payment.amount`
+
+Reason:
+
+- Money should be stored precisely.
+- Floating-point numbers can create rounding issues.
+- Prisma and PostgreSQL support decimal values well.
+
+## 2026-07-16 - Keep Paid Amount On Installment
+
+Decision:
+
+Store `paidAmount` on `Installment` even though Phase 1 only supports full installment payment.
+
+Reason:
+
+- In Phase 1, `paidAmount` will be either zero or equal to `totalAmount`.
+- The field makes payment state easy to display.
+- It prepares the model for partial payments in a later phase.
+
+## 2026-07-16 - Store Reviewer On Loan Application
+
+Decision:
+
+Store `reviewedById` on `LoanApplication`.
+
+Reason:
+
+- It records which admin reviewed the application.
+- It supports auditability and admin accountability.
+- It is useful for dashboard/reporting later.
+
+## 2026-07-16 - Audit Metadata
+
+Decision:
+
+Store extra audit log details in a JSON `metadata` field.
+
+Reason:
+
+- Different audit actions need different details.
+- JSON lets us store action-specific context without creating many nullable columns.
+- It is useful for recording old/new statuses, rejection reasons, generated installment counts, and payment references.
+
+## 2026-07-16 - API Contract Groups
+
+Decision:
+
+Group the API contract by product capability:
+
+- Auth APIs
+- Customer Loan APIs
+- Collateral APIs
+- Admin Review APIs
+- Installment and Payment APIs
+- Dashboard APIs
+- Admin Audit Log APIs
+
+Reason:
+
+- Grouping endpoints by capability makes the backend easier to navigate.
+- It maps cleanly to NestJS modules and Swagger tags.
+- It helps frontend work because each UI area has a clear API surface.
+
+## 2026-07-16 - Stepper Save Endpoints
+
+Decision:
+
+Use separate endpoints for saving customer loan application steps.
+
+Examples:
+
+- `PATCH /loans/:id/loan-details`
+- `PATCH /loans/:id/financial-profile`
+- `PATCH /loans/:id/current-step`
+
+Reason:
+
+- The frontend uses a stepper form.
+- Separate endpoints make validation and business rules easier to understand.
+- Each endpoint maps to a clear user action.
+
+## 2026-07-16 - Pagination Standard
+
+Decision:
+
+Use page-based pagination for list endpoints.
+
+Query params:
+
+- `page`
+- `limit`
+
+Defaults:
+
+- `page = 1`
+- `limit = 10`
+
+Maximum:
+
+- `limit = 50`
+
+Response shape:
+
+```json
+{
+  "data": [],
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "total": 57,
+    "totalPages": 6
+  }
+}
+```
+
+Paginated endpoints:
+
+- `GET /loans/my`
+- `GET /admin/loans`
+- `GET /admin/audit-logs`
+
+Reason:
+
+- Pagination prevents APIs from returning too much data at once.
+- The response shape is predictable for the frontend.
+- The same pagination style can be reused across the backend.
+
+## 2026-07-16 - Swagger API Documentation
+
+Decision:
+
+Use Swagger/OpenAPI for backend API documentation and expose it at `/api/docs`.
+
+Reason:
+
+- Swagger makes the API visible and testable during development.
+- It helps the frontend understand endpoint shapes and auth requirements.
+- It is useful for learning NestJS DTOs, decorators, and API contracts.
+- It can reduce the need for Postman during early development.
