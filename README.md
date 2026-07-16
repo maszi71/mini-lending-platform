@@ -91,6 +91,8 @@ mini-lending-platform/
 │   ├── 00-project-overview.md
 │   ├── 01-decisions.md
 │   ├── 02-learning-notes.md
+│   ├── 03-project-flow.md
+│   ├── 04-prisma-schema-design.md
 │   └── project-notes.md
 └── docker-compose.yml
 ```
@@ -101,6 +103,8 @@ mini-lending-platform/
 - [Decision log](./docs/01-decisions.md)
 - [Learning notes](./docs/02-learning-notes.md)
 - [Documentation index](./docs/project-notes.md)
+- [Project flow](./docs/03-project-flow.md)
+- [Prisma schema design](./docs/04-prisma-schema-design.md)
 
 ## Current Product Decisions
 

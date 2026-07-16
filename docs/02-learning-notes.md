@@ -316,7 +316,7 @@ Interest calculation defines how the loan repayment amount is calculated from ap
 For the MVP, we use a simple fixed-interest formula:
 
 ```txt
-totalInterest = approvedAmount * annualInterestRate * approvedDurationMonths / 12
+totalInterest = approvedAmount * (annualInterestRate / 100) * approvedDurationMonths / 12
 totalPayable = approvedAmount + totalInterest
 monthlyInstallment = totalPayable / approvedDurationMonths
 ```
@@ -324,6 +324,8 @@ monthlyInstallment = totalPayable / approvedDurationMonths
 This is intentionally simpler than real banking amortization formulas.
 
 The goal is to practice backend business logic and installment generation without making the financial math too complex too early.
+
+In this project, `annualInterestRate` is stored as a percentage number. For example, `24` means `24%`.
 
 ## Monthly Income
 
@@ -465,6 +467,75 @@ It includes:
 - Indexes
 
 In this project, the database schema will be designed through Prisma models and then applied to PostgreSQL through migrations.
+
+## Prisma Schema
+
+A Prisma schema is the file where we define database models, fields, relations, enums, and Prisma Client generation settings.
+
+In this project, the actual schema will live at:
+
+```txt
+backend/prisma/schema.prisma
+```
+
+The Prisma schema is where our domain model becomes concrete database structure.
+
+## Optional Field
+
+An optional field is a field that may be empty.
+
+In Prisma, optional fields use `?`.
+
+Example:
+
+```prisma
+requestedAmount Decimal?
+```
+
+This is useful for drafts because a user may start a loan application before completing all required data.
+
+The database allows the field to be empty, but backend business rules can still require it before submit.
+
+## Unique Constraint
+
+A unique constraint means two records cannot have the same value for a field or group of fields.
+
+Examples:
+
+```prisma
+email       String @unique
+phoneNumber String @unique
+```
+
+In this project, `email` and `phoneNumber` are unique because users can log in with either one.
+
+## Index
+
+An index helps the database find, filter, or sort records faster.
+
+Example:
+
+```prisma
+@@index([status])
+```
+
+This is useful because admins will filter loan applications by status.
+
+Indexes improve reads, but too many indexes can slow writes, so they should be added intentionally.
+
+## Foreign Key
+
+A foreign key connects one table to another table.
+
+Example:
+
+```txt
+LoanApplication.customerId -> User.id
+```
+
+This means each loan application belongs to one user.
+
+In Prisma, relationships define these connections in the schema.
 
 ## Monorepo
 

@@ -194,7 +194,7 @@ Use a simple fixed-interest calculation for Phase 1.
 Formula:
 
 ```txt
-totalInterest = approvedAmount * annualInterestRate * approvedDurationMonths / 12
+totalInterest = approvedAmount * (annualInterestRate / 100) * approvedDurationMonths / 12
 totalPayable = approvedAmount + totalInterest
 monthlyInstallment = totalPayable / approvedDurationMonths
 ```
@@ -212,6 +212,8 @@ monthlyInstallment = 10,333,333
 ```
 
 This is intentionally simple for the MVP. More realistic amortized loan calculations can be added later.
+
+`annualInterestRate` is stored as a percentage number. For example, `24` means `24%`.
 
 ## Domain Model
 

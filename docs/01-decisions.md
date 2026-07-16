@@ -333,7 +333,7 @@ Use a simple fixed-interest calculation for Phase 1.
 Formula:
 
 ```txt
-totalInterest = approvedAmount * annualInterestRate * approvedDurationMonths / 12
+totalInterest = approvedAmount * (annualInterestRate / 100) * approvedDurationMonths / 12
 totalPayable = approvedAmount + totalInterest
 monthlyInstallment = totalPayable / approvedDurationMonths
 ```
@@ -344,6 +344,7 @@ Reason:
 - It is enough for practicing installment generation.
 - It avoids overcomplicating the MVP with amortization formulas.
 - More realistic interest calculations can be added later.
+- `annualInterestRate` is stored as a percentage number. For example, `24` means `24%`.
 
 ## 2026-07-16 - Domain Model Entities
 
@@ -535,3 +536,27 @@ Reason:
 - It helps the frontend understand endpoint shapes and auth requirements.
 - It is useful for learning NestJS DTOs, decorators, and API contracts.
 - It can reduce the need for Postman during early development.
+
+## 2026-07-16 - Reusable Project Flow Documentation
+
+Decision:
+
+Create `docs/03-project-flow.md` to document the reusable flow from idea to implementation.
+
+Reason:
+
+- The user wants to learn the correct direction for future projects.
+- A diagram makes the full process easier to remember.
+- The flow connects product thinking to backend, database, API, and frontend implementation.
+
+## 2026-07-16 - Prisma Schema Design Document
+
+Decision:
+
+Create `docs/04-prisma-schema-design.md` before implementing the actual Prisma schema.
+
+Reason:
+
+- It lets us review models, fields, relations, indexes, and constraints before coding.
+- It keeps the actual implementation grounded in the domain model and business rules.
+- It gives the user a clear explanation of how domain concepts become database models.
