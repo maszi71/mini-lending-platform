@@ -56,6 +56,54 @@ View installments after approval
 Pay installment with mock payment
 ```
 
+## Stepper
+
+A stepper is a UI pattern that breaks a larger process into smaller ordered steps.
+
+In this project, the loan application form will use these steps:
+
+```txt
+LOAN_DETAILS
+FINANCIAL_PROFILE
+COLLATERAL
+REVIEW
+```
+
+A stepper is useful when one large form would feel too heavy or confusing.
+
+## Form Progress
+
+Form progress describes where the user is inside a multi-step form.
+
+In this project, form progress is stored as `currentStep`.
+
+Example:
+
+```txt
+currentStep = COLLATERAL
+```
+
+This means the customer was last working on the collateral step.
+
+Form progress is different from business status.
+
+## Business Status Vs Form Progress
+
+Business status describes the real lifecycle of a business record.
+
+Form progress describes where the user is in the UI while creating or editing that record.
+
+Example:
+
+```txt
+status = DRAFT
+currentStep = COLLATERAL
+```
+
+This means the loan application is still only a draft, and the customer last reached the collateral step.
+
+This separation matters because backend business rules should depend mostly on business status, while the frontend stepper depends on form progress.
+
 ## Feature
 
 A feature is a product capability that supports a user flow.
@@ -132,6 +180,35 @@ A draft is a record that has been started but not officially submitted or finali
 In this project, `DRAFT` means the customer is still preparing the loan application. The customer may fill part of the form, leave, return later, edit it, add collateral, and then submit it when ready.
 
 After the customer submits the application, the status changes from `DRAFT` to `SUBMITTED`.
+
+## Identifier Login
+
+Identifier login means using one login field that accepts more than one type of identity value.
+
+In this project, the user can log in with either:
+
+- Email
+- Phone number
+
+The request body can look like this:
+
+```json
+{
+  "identifier": "user@example.com",
+  "password": "12345678"
+}
+```
+
+or:
+
+```json
+{
+  "identifier": "09123456789",
+  "password": "12345678"
+}
+```
+
+The backend finds the user by checking whether the identifier matches an email or phone number, then verifies the password.
 
 ## Duration
 

@@ -81,6 +81,13 @@ Initial installment statuses:
 - `PAID`
 - `OVERDUE`
 
+Initial loan application form steps:
+
+- `LOAN_DETAILS`
+- `FINANCIAL_PROFILE`
+- `COLLATERAL`
+- `REVIEW`
+
 ## Open Questions
 
 - Which fields should be required on the first version of a loan application?

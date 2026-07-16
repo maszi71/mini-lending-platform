@@ -162,3 +162,84 @@ Reason:
 - This matches real-world workflows for applications, forms, contracts, invoices, and tickets.
 - It lets the backend enforce useful business rules instead of simple CRUD behavior.
 - It creates a clear status workflow: `DRAFT -> SUBMITTED -> UNDER_REVIEW -> APPROVED` or `REJECTED`.
+
+## 2026-07-16 - User Profile Fields
+
+Decision:
+
+Store the user's name as separate `firstName` and `lastName` fields. Also store `email`, `phoneNumber`, and `birthDate`.
+
+Reason:
+
+- Separate first and last names are easier to display, search, and reuse in formal documents later.
+- Phone number is useful for fintech workflows and future OTP support.
+- Birth date is useful for identity and eligibility checks.
+- Email and phone number should both be unique.
+
+## 2026-07-16 - Login Identifier
+
+Decision:
+
+Use one login field called `identifier`, plus `password`. The identifier can be either email or phone number.
+
+Reason:
+
+- This gives users a simpler login experience.
+- The backend can find the user with `email = identifier OR phoneNumber = identifier`.
+- Unique email and phone number constraints prevent ambiguous login matches.
+
+## 2026-07-16 - Stepper-Based Loan Application Form
+
+Decision:
+
+Use a multi-step form for customer loan applications instead of one large form.
+
+Initial steps:
+
+- `LOAN_DETAILS`
+- `FINANCIAL_PROFILE`
+- `COLLATERAL`
+- `REVIEW`
+
+Reason:
+
+- Loan applications can feel heavy if all fields are shown at once.
+- A stepper gives clearer progress and better UX.
+- It makes draft saving easier to understand.
+- Each step maps naturally to backend validation and saved draft data.
+
+## 2026-07-16 - Store Current Application Step
+
+Decision:
+
+Store draft progress with a `currentStep` enum on the loan application.
+
+Initial enum values:
+
+- `LOAN_DETAILS`
+- `FINANCIAL_PROFILE`
+- `COLLATERAL`
+- `REVIEW`
+
+Reason:
+
+- If the user refreshes, logs out, or comes back later, the app can restore the draft at the correct step.
+- Enum values are more readable than numeric step values.
+- `currentStep` represents form progress, not the business review status.
+
+## 2026-07-16 - Separate Business Status From Form Progress
+
+Decision:
+
+Keep loan business status separate from loan application form progress.
+
+Examples:
+
+- `status = DRAFT`
+- `currentStep = COLLATERAL`
+
+Reason:
+
+- `status` describes the business workflow, such as `DRAFT`, `SUBMITTED`, `UNDER_REVIEW`, `APPROVED`, or `REJECTED`.
+- `currentStep` describes where the customer is inside the draft form.
+- Separating them prevents UI progress from being confused with real business state.
