@@ -149,6 +149,20 @@ Examples:
 
 Business rules should be enforced by the backend, not only by the frontend.
 
+Backend enforcement matters because frontend checks can be bypassed, broken, or skipped by direct API calls.
+
+Example:
+
+Even if the frontend hides the submit button until collateral exists, the backend must still reject a submit request when the application has no collateral.
+
+Business rules help shape:
+
+- DTO validation
+- Service logic
+- Database constraints
+- API error cases
+- Automated tests
+
 ## State Workflow
 
 A state workflow describes how a record moves through different statuses over time.
@@ -222,6 +236,22 @@ Examples:
 - 24 months
 
 If a loan is approved with a 12 month duration, the system should create 12 installments.
+
+## Interest Calculation
+
+Interest calculation defines how the loan repayment amount is calculated from approved amount, duration, and interest rate.
+
+For the MVP, we use a simple fixed-interest formula:
+
+```txt
+totalInterest = approvedAmount * annualInterestRate * approvedDurationMonths / 12
+totalPayable = approvedAmount + totalInterest
+monthlyInstallment = totalPayable / approvedDurationMonths
+```
+
+This is intentionally simpler than real banking amortization formulas.
+
+The goal is to practice backend business logic and installment generation without making the financial math too complex too early.
 
 ## Monthly Income
 

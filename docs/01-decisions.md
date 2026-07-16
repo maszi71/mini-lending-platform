@@ -243,3 +243,104 @@ Reason:
 - `status` describes the business workflow, such as `DRAFT`, `SUBMITTED`, `UNDER_REVIEW`, `APPROVED`, or `REJECTED`.
 - `currentStep` describes where the customer is inside the draft form.
 - Separating them prevents UI progress from being confused with real business state.
+
+## 2026-07-16 - MVP Loan Data
+
+Decision:
+
+Use a focused set of loan application fields for the MVP.
+
+Loan details:
+
+- `requestedAmount`
+- `requestedDurationMonths`
+- `purpose`
+- `description`
+
+Financial profile:
+
+- `monthlyIncome`
+- `employmentType`
+- `existingMonthlyDebt`
+
+Collateral:
+
+- `type`
+- `estimatedValue`
+- `description`
+
+Admin approval data:
+
+- `approvedAmount`
+- `approvedDurationMonths`
+- `annualInterestRate`
+- `decisionReason`
+
+System tracking data:
+
+- `status`
+- `currentStep`
+- `submittedAt`
+- `reviewedAt`
+
+Reason:
+
+- These fields are enough to represent the core lending story.
+- The customer can request an amount and duration.
+- The customer can explain the purpose and provide basic repayment information.
+- The customer can provide collateral.
+- The admin can approve with final terms or reject with a reason.
+- The system can track workflow status, draft progress, and review timestamps.
+
+## 2026-07-16 - MVP Business Rules
+
+Decision:
+
+Use explicit backend-enforced business rules for the loan application workflow.
+
+Rules:
+
+- Customers create loan applications only as `DRAFT`.
+- Customers can edit only their own `DRAFT` applications.
+- Customers can cancel only their own `DRAFT` or `SUBMITTED` applications.
+- Customers cannot cancel after an application is `UNDER_REVIEW`.
+- Customers can move to the next form step only when the current step has valid data.
+- Customers can submit only their own `DRAFT` applications.
+- Submission requires loan details, financial profile data, and at least one collateral.
+- After submit, customers cannot edit application fields or collateral fields.
+- Admins must start review before approving or rejecting.
+- Admins can approve or reject only `UNDER_REVIEW` applications.
+- Approval requires approved amount, approved duration, and annual interest rate.
+- Approved amount must be less than or equal to requested amount.
+- Rejection requires a decision reason.
+- Approval creates installments automatically.
+- Phase 1 supports full installment payment only.
+- Paid installments cannot be paid again.
+- The system writes audit logs for important workflow actions.
+
+Reason:
+
+- These rules make the app more realistic than simple CRUD.
+- The backend must protect workflow correctness even if the frontend has bugs.
+- Explicit rules make API design, validation, testing, and later database modeling clearer.
+
+## 2026-07-16 - MVP Interest Calculation
+
+Decision:
+
+Use a simple fixed-interest calculation for Phase 1.
+
+Formula:
+
+```txt
+totalInterest = approvedAmount * annualInterestRate * approvedDurationMonths / 12
+totalPayable = approvedAmount + totalInterest
+monthlyInstallment = totalPayable / approvedDurationMonths
+```
+
+Reason:
+
+- It is easy to understand.
+- It is enough for practicing installment generation.
+- It avoids overcomplicating the MVP with amortization formulas.
+- More realistic interest calculations can be added later.
