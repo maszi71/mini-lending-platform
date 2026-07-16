@@ -1,0 +1,228 @@
+# Learning Notes
+
+This file records product, backend, database, and architecture concepts we learn during the project.
+
+## Product Idea
+
+A product idea is the high-level description of what we are building, who it serves, and what problem it solves.
+
+In this project, the product idea is a mini lending platform where customers apply for loans and admins review those applications.
+
+## MVP
+
+MVP means Minimum Viable Product.
+
+It is the smallest useful version of the product that can be built, tested, and improved.
+
+For this project, the MVP is Phase 1: auth, loan application flow, collateral, admin review, installment generation, mock payment, dashboard, and audit logs.
+
+## Phase
+
+A phase is a planned delivery step.
+
+We use phases to separate must-have features from later improvements.
+
+In this project:
+
+- Phase 1 is the MVP.
+- Phase 2 is optional improvement work if there is time.
+
+## User Role
+
+A user role describes what type of user is using the system and what they are allowed to do.
+
+Examples in this project:
+
+- `CUSTOMER`
+- `ADMIN`
+
+Roles are important because they affect both frontend routing and backend authorization.
+
+## User Flow
+
+A user flow is the step-by-step path a user follows to complete a task.
+
+Example customer flow:
+
+```txt
+Register
+Login
+Create loan application
+Add collateral
+Submit application
+Wait for review
+View decision
+View installments after approval
+Pay installment with mock payment
+```
+
+## Feature
+
+A feature is a product capability that supports a user flow.
+
+Example:
+
+The customer flow needs a "create loan application" feature.
+
+That feature may require:
+
+- A frontend form
+- A backend endpoint
+- DTO validation
+- Database records
+- Authorization rules
+
+## Entity
+
+An entity is a business object or concept that the system needs to store, process, or reason about.
+
+Examples in this project:
+
+- `User`
+- `LoanApplication`
+- `Collateral`
+- `Installment`
+- `Payment`
+- `AuditLog`
+
+Entities usually become database tables, Prisma models, and backend concepts.
+
+## Business Rule
+
+A business rule is a condition that controls what the system allows, blocks, or automatically performs.
+
+Examples:
+
+- A customer cannot submit a loan application without collateral.
+- A customer can edit a draft application.
+- A customer cannot edit a submitted application.
+- Only an admin can approve or reject applications.
+- Approving a loan creates an installment schedule.
+
+Business rules should be enforced by the backend, not only by the frontend.
+
+## State Workflow
+
+A state workflow describes how a record moves through different statuses over time.
+
+In this project, a loan application is not just created, edited, and deleted. It moves through meaningful states:
+
+```txt
+DRAFT -> SUBMITTED -> UNDER_REVIEW -> APPROVED
+DRAFT -> SUBMITTED -> UNDER_REVIEW -> REJECTED
+```
+
+Each state has rules.
+
+Examples:
+
+- A customer can edit a `DRAFT` application.
+- A customer can submit only a `DRAFT` application.
+- A customer should not freely edit a `SUBMITTED` application.
+- An admin can start reviewing a `SUBMITTED` application.
+- An admin can approve or reject an application during review.
+- Approving an application creates installments.
+
+State workflows are common in real systems such as loan applications, invoices, support tickets, order fulfillment, and contract approvals.
+
+## Draft
+
+A draft is a record that has been started but not officially submitted or finalized.
+
+In this project, `DRAFT` means the customer is still preparing the loan application. The customer may fill part of the form, leave, return later, edit it, add collateral, and then submit it when ready.
+
+After the customer submits the application, the status changes from `DRAFT` to `SUBMITTED`.
+
+## Duration
+
+Duration means how many months the customer wants to use for repayment.
+
+Examples:
+
+- 6 months
+- 12 months
+- 18 months
+- 24 months
+
+If a loan is approved with a 12 month duration, the system should create 12 installments.
+
+## Monthly Income
+
+Monthly income helps the admin estimate whether the customer can realistically repay the loan.
+
+Even when collateral exists, income is useful because collateral protects the lender, while income shows repayment ability.
+
+For the MVP, monthly income is an informational field for admin review. Later, it can be used for risk scoring or affordability checks.
+
+## Audit Log
+
+An audit log is a history of important actions in the system.
+
+It helps answer:
+
+- Who did what?
+- When did they do it?
+- What changed?
+- Why did it happen?
+
+Example loan application audit history:
+
+```txt
+Customer created draft application.
+Customer added collateral.
+Customer submitted application.
+Admin started review.
+Admin approved application.
+System generated installments.
+```
+
+Audit logs are especially important in fintech because they help with traceability, compliance, debugging, security, admin accountability, and customer support.
+
+## API Contract
+
+An API contract defines how the frontend and backend communicate.
+
+It usually includes:
+
+- Endpoint URL
+- HTTP method
+- Request body
+- Response shape
+- Authentication requirement
+- Error cases
+
+Example:
+
+```txt
+POST /loans/:id/submit
+```
+
+This endpoint may mean: submit a draft loan application for admin review.
+
+## Database Schema
+
+A database schema describes how data is stored in the database.
+
+It includes:
+
+- Tables
+- Columns
+- Data types
+- Relations
+- Constraints
+- Indexes
+
+In this project, the database schema will be designed through Prisma models and then applied to PostgreSQL through migrations.
+
+## Monorepo
+
+A monorepo is one repository that contains multiple related projects.
+
+In this project, the monorepo contains:
+
+- `backend`
+- `frontend`
+- `docs`
+- `docker-compose.yml`
+
+This keeps the full-stack project together while still separating backend and frontend code.
