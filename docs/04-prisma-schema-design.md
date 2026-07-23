@@ -20,7 +20,10 @@ backend/prisma/schema.prisma
 - Use explicit relation names where one model relates to another model in more than one way.
 - Use indexes on common filter and lookup fields.
 - Generate Prisma Client into `backend/src/generated/prisma`.
+- Use `moduleFormat = "cjs"` because NestJS currently runs this project as CommonJS.
 - Do not commit generated client files; regenerate them with npm scripts.
+- Compile the Nest app from `backend/src` so runtime output starts at `dist/main.js`.
+- Use the Nest `tsc` builder explicitly for watch/start scripts so the emitted entry path matches runtime execution.
 
 ## Enums
 

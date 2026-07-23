@@ -137,6 +137,19 @@ Current verification result:
 - ESLint passes
 - Nest build passes
 - Default unit test passes
-- npm audit reports zero vulnerabilities
+- Last successful npm audit after dependency fixes reported zero vulnerabilities
+- Root endpoint returns `200 OK`
+- Swagger UI responds at `/api/docs`
+- Swagger JSON responds at `/api/docs-json`
+- Register validation returns `400 Bad Request` for invalid input
+- `POST /auth/register` creates a `CUSTOMER`
+- duplicate register returns `409 Conflict`
+- `POST /auth/login` works with email and phone number
+- invalid login returns `401 Unauthorized`
+- `GET /auth/me` returns the current user with a valid bearer token
+- `GET /auth/me` without a token returns `401 Unauthorized`
+- `npm run start:dev` starts successfully in watch mode
 
-Live HTTP testing for auth endpoints still needs Docker Desktop/PostgreSQL running locally.
+Runtime testing requires Docker Desktop/PostgreSQL to be running locally.
+
+Note: the latest `npm audit --audit-level=moderate` retry failed because the npm audit registry endpoint returned an error. It did not report a dependency vulnerability.
