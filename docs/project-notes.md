@@ -6,7 +6,11 @@ This file is the documentation index for the project.
 - [Decision log](./01-decisions.md)
 - [Learning notes](./02-learning-notes.md)
 - [Project flow](./03-project-flow.md)
+- [Project flow HTML diagram](./03-project-flow.html)
 - [Prisma schema design](./04-prisma-schema-design.md)
+- [Implementation status](./05-implementation-status.md)
+- [NestJS backend learning notes](./06-nestjs-backend-learning.md)
+- [NestJS backend HTML diagrams](./06-nestjs-backend-diagrams.html)
 
 Use these files while designing and building the project:
 
@@ -14,4 +18,8 @@ Use these files while designing and building the project:
 - `01-decisions.md` records decisions and reasons.
 - `02-learning-notes.md` records concepts learned during the project.
 - `03-project-flow.md` explains the reusable flow from idea to implementation.
+- `03-project-flow.html` shows the project flow as an HTML diagram.
 - `04-prisma-schema-design.md` translates the domain model into planned Prisma models.
+- `05-implementation-status.md` tracks what has been implemented and what remains.
+- `06-nestjs-backend-learning.md` explains NestJS, auth, validation, Swagger, and Prisma concepts.
+- `06-nestjs-backend-diagrams.html` contains browser-openable HTML diagrams for NestJS/backend concepts.

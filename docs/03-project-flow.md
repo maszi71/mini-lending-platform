@@ -6,22 +6,9 @@ The goal is to make the process reusable for future full-stack projects.
 
 ## Full Flow
 
-```mermaid
-flowchart TD
-  A["Product idea"] --> B["MVP scope"]
-  B --> C["User roles"]
-  C --> D["User flows"]
-  D --> E["Feature list"]
-  E --> F["Business rules"]
-  F --> G["Domain model"]
-  G --> H["API contract"]
-  G --> I["Database schema / Prisma schema"]
-  H --> J["Backend implementation"]
-  I --> J
-  J --> K["Swagger API docs"]
-  K --> L["Frontend implementation"]
-  L --> M["Testing and iteration"]
-```
+Open the HTML diagram:
+
+[Project flow diagram](./03-project-flow.html)
 
 ## Step Meanings
 

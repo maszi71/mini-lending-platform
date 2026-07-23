@@ -537,6 +537,217 @@ This means each loan application belongs to one user.
 
 In Prisma, relationships define these connections in the schema.
 
+## ConfigModule
+
+`ConfigModule` is a NestJS module for loading environment variables.
+
+In this project, it loads values such as:
+
+- `PORT`
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `JWT_EXPIRES_IN`
+
+We also validate required values at startup so configuration problems fail early.
+
+## PrismaModule
+
+`PrismaModule` wraps Prisma database access in a NestJS module.
+
+The main provider is `PrismaService`.
+
+This lets other modules inject Prisma instead of creating database clients manually.
+
+## DTO
+
+DTO means Data Transfer Object.
+
+In NestJS, DTO classes describe the shape of data moving into or out of the API.
+
+Most commonly, DTOs describe request bodies.
+
+Example:
+
+```txt
+RegisterDto
+LoginDto
+```
+
+`RegisterDto` means: this is the data the backend expects when someone calls `POST /auth/register`.
+
+DTOs are useful because they connect:
+
+- Runtime validation
+- TypeScript types
+- Swagger documentation
+
+DTOs are not database models. A DTO describes API input/output, while a Prisma model describes database storage.
+
+## ValidationPipe
+
+`ValidationPipe` makes NestJS validate incoming requests using DTO decorators.
+
+In this project, it is configured globally.
+
+`whitelist: true` removes unknown fields from incoming request bodies.
+
+## JWT
+
+JWT means JSON Web Token.
+
+After login, the backend returns an access token. The frontend sends it on protected requests:
+
+```txt
+Authorization: Bearer <token>
+```
+
+The backend validates the token and identifies the user.
+
+## Guard
+
+A guard decides whether a request is allowed to continue.
+
+Examples in this project:
+
+- `JwtAuthGuard` checks whether the user has a valid JWT.
+- `RolesGuard` checks whether the authenticated user has one of the required roles.
+
+Guards are important for backend authorization.
+
+## Decorator
+
+A decorator adds metadata or behavior to a class, method, or parameter.
+
+NestJS uses decorators heavily.
+
+Examples:
+
+```ts
+@Controller('auth')
+@Post('login')
+@UseGuards(JwtAuthGuard)
+```
+
+In this project:
+
+- `@CurrentUser()` reads the authenticated user from the request.
+- `@Roles(UserRole.ADMIN)` marks a route as admin-only.
+- `@ApiTags('Auth')` adds Swagger metadata.
+
+Decorators make code declarative: we describe what a route needs, and NestJS uses that metadata at runtime.
+
+## Controller
+
+A controller receives HTTP requests and returns HTTP responses.
+
+Controller responsibility:
+
+- Define routes
+- Read request data
+- Call services
+- Return service results
+
+Controllers should stay thin. Business logic should usually live in services.
+
+## Service
+
+A service contains business logic.
+
+Service responsibility:
+
+- Validate workflow rules
+- Read/write database records
+- Call other services
+- Return useful data to controllers
+
+Example:
+
+`AuthService` hashes passwords, creates users, validates login, and signs JWT tokens.
+
+## Module
+
+A module groups related NestJS code.
+
+Example:
+
+`AuthModule` groups:
+
+- `AuthController`
+- `AuthService`
+- `JwtStrategy`
+- JWT/Passport imports
+
+Modules help keep large backends organized by feature.
+
+## Provider
+
+A provider is a class that NestJS can create and inject into other classes.
+
+Most services are providers.
+
+Example:
+
+`PrismaService` is injected into `AuthService` so auth code can access the database.
+
+## Dependency Injection
+
+Dependency injection means a class receives the objects it needs from NestJS instead of creating them manually.
+
+Example:
+
+```ts
+constructor(private readonly authService: AuthService) {}
+```
+
+The controller does not create `AuthService`; NestJS provides it.
+
+This makes code easier to test, replace, and organize.
+
+## Strategy
+
+A Passport strategy defines how authentication is performed.
+
+In this project, `JwtStrategy` reads the bearer token, validates it, and attaches the authenticated user to the request.
+
+## JWT Payload
+
+The JWT payload is the data we put inside the token.
+
+In this project, the payload contains:
+
+```txt
+sub
+email
+phoneNumber
+role
+```
+
+`sub` means subject and stores the user ID.
+
+The payload should contain useful identity/authorization data, but it should not contain secrets like password hashes.
+
+## Passport
+
+Passport is an authentication middleware library.
+
+NestJS integrates with Passport through `@nestjs/passport`.
+
+In this project:
+
+- `passport-jwt` knows how to read and validate bearer JWT tokens.
+- `JwtStrategy` configures how JWT authentication works.
+- `JwtAuthGuard` uses that strategy to protect routes.
+
+## Password Hashing
+
+Password hashing stores a one-way hash instead of the raw password.
+
+In this project, registration hashes the password with bcrypt before saving the user.
+
+Login compares the submitted password with the stored hash.
+
+Raw passwords should never be stored in the database.
+
 ## Monorepo
 
 A monorepo is one repository that contains multiple related projects.

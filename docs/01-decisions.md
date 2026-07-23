@@ -590,3 +590,54 @@ Reason:
 - Port `5432` was already allocated on the user's machine.
 - Using `5433` avoids conflict with an existing local PostgreSQL instance.
 - The container still uses PostgreSQL's internal port `5432`.
+
+## 2026-07-23 - Backend Foundation And Auth First
+
+Decision:
+
+Implement backend foundation and auth before loan features.
+
+Included:
+
+- `ConfigModule`
+- `PrismaModule`
+- Swagger setup
+- global validation pipe
+- `AuthModule`
+- JWT auth
+- `CurrentUser` decorator
+- role authorization foundation
+
+Reason:
+
+- Every later feature needs authenticated users.
+- Loan ownership checks require the current customer ID.
+- Admin review endpoints require role checks.
+- Audit logs need an actor ID.
+
+## 2026-07-23 - Public Registration Creates Customers Only
+
+Decision:
+
+`POST /auth/register` creates users with role `CUSTOMER` only.
+
+Reason:
+
+- Public registration should not create admins.
+- Admin creation will be handled later through a seed script or protected admin workflow.
+
+## 2026-07-23 - Identifier Login Implementation
+
+Decision:
+
+`POST /auth/login` accepts `identifier` and `password`.
+
+`identifier` can match either:
+
+- `email`
+- `phoneNumber`
+
+Reason:
+
+- This matches the product decision made during customer flow design.
+- Unique email and phone constraints prevent ambiguous matches.

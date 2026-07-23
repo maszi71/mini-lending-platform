@@ -104,7 +104,11 @@ mini-lending-platform/
 - [Learning notes](./docs/02-learning-notes.md)
 - [Documentation index](./docs/project-notes.md)
 - [Project flow](./docs/03-project-flow.md)
+- [Project flow HTML diagram](./docs/03-project-flow.html)
 - [Prisma schema design](./docs/04-prisma-schema-design.md)
+- [Implementation status](./docs/05-implementation-status.md)
+- [NestJS backend learning notes](./docs/06-nestjs-backend-learning.md)
+- [NestJS backend HTML diagrams](./docs/06-nestjs-backend-diagrams.html)
 
 ## Local Development
 
@@ -132,6 +136,7 @@ npm run prisma:validate
 npm run prisma:generate
 npm run build
 npm test -- --runInBand
+npm audit --audit-level=moderate
 ```
 
 ## Current Product Decisions
@@ -145,4 +150,4 @@ npm test -- --runInBand
 
 ## Status
 
-Backend scaffold, Docker PostgreSQL setup, and initial Prisma schema are in progress.
+Backend scaffold, Docker PostgreSQL setup, initial Prisma schema, backend config, Prisma service, Swagger, and auth foundation are in progress.
