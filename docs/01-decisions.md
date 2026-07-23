@@ -641,3 +641,16 @@ Reason:
 
 - This matches the product decision made during customer flow design.
 - Unique email and phone constraints prevent ambiguous matches.
+
+## 2026-07-23 - Seed Admin User
+
+Decision:
+
+Create the first admin through a seed script instead of public registration.
+
+Reason:
+
+- Public registration should only create `CUSTOMER` users.
+- Exposing public admin registration would be unsafe.
+- A seed script is a controlled setup mechanism for required initial data.
+- The seed is idempotent, so running it multiple times does not create duplicate admins.

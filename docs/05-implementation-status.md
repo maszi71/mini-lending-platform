@@ -93,6 +93,24 @@ Auth behavior:
 - Login returns JWT access token and user profile
 - `/auth/me` requires bearer token
 
+### Admin Seed
+
+- `backend/prisma/seed.ts` added
+- `npm run prisma:seed` command added
+- Seed reads admin values from environment variables
+- Seed hashes the admin password with bcrypt
+- Seed creates an `ADMIN` user
+- Seed is idempotent and skips creation when the admin already exists
+
+Seed environment variables:
+
+- `SEED_ADMIN_FIRST_NAME`
+- `SEED_ADMIN_LAST_NAME`
+- `SEED_ADMIN_EMAIL`
+- `SEED_ADMIN_PHONE_NUMBER`
+- `SEED_ADMIN_BIRTH_DATE`
+- `SEED_ADMIN_PASSWORD`
+
 ## Pending
 
 ### Backend
@@ -149,6 +167,11 @@ Current verification result:
 - `GET /auth/me` returns the current user with a valid bearer token
 - `GET /auth/me` without a token returns `401 Unauthorized`
 - `npm run start:dev` starts successfully in watch mode
+- `npm run prisma:seed` creates the admin user on first run
+- running `npm run prisma:seed` again skips the existing admin
+- seeded admin can log in with email
+- seeded admin can log in with phone number
+- seeded admin `/auth/me` returns role `ADMIN`
 
 Runtime testing requires Docker Desktop/PostgreSQL to be running locally.
 

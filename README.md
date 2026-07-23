@@ -137,6 +137,7 @@ npm run prisma:generate
 npm run build
 npm test -- --runInBand
 npm audit --audit-level=moderate
+npm run prisma:seed
 ```
 
 ## Current Product Decisions

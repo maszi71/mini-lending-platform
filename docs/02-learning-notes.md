@@ -748,6 +748,43 @@ Login compares the submitted password with the stored hash.
 
 Raw passwords should never be stored in the database.
 
+## Seed Script
+
+A seed script inserts initial data into the database from the terminal.
+
+Example:
+
+```bash
+npm run prisma:seed
+```
+
+Seed scripts are useful for:
+
+- creating the first admin user
+- creating default data
+- creating demo/test data
+- preparing local development databases
+
+In this project, public registration creates only `CUSTOMER` users. The seed script creates the first `ADMIN` user in a controlled way.
+
+This avoids exposing public admin registration.
+
+## Idempotent Seed
+
+An idempotent seed can be run many times without creating duplicate data.
+
+Example:
+
+```txt
+First run:
+Admin does not exist -> create admin
+
+Second run:
+Admin already exists -> skip
+```
+
+This is important because setup scripts are often run repeatedly during development.
+
 ## Monorepo
 
 A monorepo is one repository that contains multiple related projects.
